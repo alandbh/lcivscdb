@@ -18,7 +18,12 @@ import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Input } from "./ui/input";
 
-export function FormCompare() {
+type CdiObject = {
+    data: string;
+    valor: string;
+};
+
+export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
     const [date, setDate] = useState<Date>();
     const [returnType, setReturnType] = useState<string>("cdi");
     const [cdiPercentage, setCdiPercentage] = useState<number[]>([100]);
@@ -41,7 +46,8 @@ export function FormCompare() {
     return (
         <>
             <Card className="w-full max-w-2xl">
-                <CardHeader>
+                <Debugg data={cdiRate} filter="cdii" />
+                <CardHeader className="border-b mb-10">
                     <CardTitle>Equivalência LCI/LCA vs CDB</CardTitle>
                     <CardDescription>
                         Preencha os dados da sua LCI/LCA.
@@ -134,9 +140,7 @@ export function FormCompare() {
                                     onSelectDate={handleSelectDate}
                                 />
                             </div>
-                            <div>
-                                <Debugg print data={date} />
-                            </div>
+                            <div>{/* <Debugg print data={date} /> */}</div>
                         </div>
                         <div className="flex flex-col justify-end">
                             <Button type="submit">
