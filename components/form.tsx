@@ -184,10 +184,11 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                                         className="font-bold"
                                         htmlFor="income-amount"
                                     >
+                                        Rendimento:{" "}
                                         <span className="text-indigo-500">
                                             {cdiPercentage[0]}%
                                         </span>{" "}
-                                        do CDI:
+                                        do CDI
                                     </Label>
                                     <div className="-mt-2 mb-2">
                                         <small className="text-slate-400">
