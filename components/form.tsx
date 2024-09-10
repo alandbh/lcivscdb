@@ -12,11 +12,14 @@ import { Label } from "@/components/ui/label";
 
 import { Button } from "@/components/ui/button";
 import { Datepicker } from "./ui/Datepicker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Debugg from "./Debugg/Index";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Input } from "./ui/input";
+import { differenceInDays } from "date-fns";
+
+import { calcularEquivalencia } from "@/lib/calculate";
 
 type CdiObject = {
     data: string;
@@ -24,25 +27,64 @@ type CdiObject = {
 };
 
 export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
-    const [date, setDate] = useState<Date>();
+    const [dueDate, setDueDate] = useState<Date>();
     const [returnType, setReturnType] = useState<string>("cdi");
     const [cdiPercentage, setCdiPercentage] = useState<number[]>([100]);
+    const [fixedRate, setFixedRate] = useState<number>(6);
+    const [isDisable, setIsDisable] = useState<boolean>(true);
 
     function handleSelectDate(date: Date) {
-        console.log("dataa", date);
+        console.log("dataa: ", new Date(date).getTime());
 
-        setDate(date);
+        setDueDate(date);
     }
 
     function handleReturnTypeChange(value: string) {
         console.log("eee", value);
         setReturnType(value);
+        setIsDisable(true);
     }
 
     function handleCdiPercentageChange(value: number[]) {
         console.log("cdi", value);
         setCdiPercentage(value);
     }
+
+    function handleFixedRateChange(value: string) {
+        setFixedRate(Number(value));
+        console.log("fixo", fixedRate);
+    }
+
+    function handleCalculateClick() {
+        if (dueDate) {
+            calcularEquivalencia(returnType, fixedRate, dueDate, cdiRate);
+        }
+    }
+
+    useEffect(() => {
+        if (returnType === "cdi") {
+            if (
+                cdiPercentage[0] > 50 &&
+                dueDate &&
+                differenceInDays(dueDate.getTime(), new Date().getTime()) > 30
+            ) {
+                setIsDisable(false);
+            } else {
+                setIsDisable(true);
+            }
+        } else {
+            if (
+                fixedRate > 6 &&
+                dueDate &&
+                differenceInDays(dueDate.getTime(), new Date().getTime()) > 30
+            ) {
+                setIsDisable(false);
+            } else {
+                setIsDisable(true);
+            }
+        }
+    }, [cdiPercentage, dueDate, fixedRate]);
+
     return (
         <>
             <Card className="w-full max-w-2xl">
@@ -95,6 +137,14 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                                         placeholder="Ex: 11,3%"
                                         className="w-28"
                                         step="0.1"
+                                        value={fixedRate}
+                                        onChange={(event) =>
+                                            handleFixedRateChange(
+                                                (
+                                                    event.target as HTMLInputElement
+                                                ).value
+                                            )
+                                        }
                                     />
                                     <small className="text-xs text-pretty text-gray-400">
                                         a/a
@@ -107,7 +157,7 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                                     className="font-bold"
                                     htmlFor="income-amount"
                                 >
-                                    % do CDI:
+                                    {cdiPercentage[0]}% do CDI:
                                 </Label>
                                 <Slider
                                     defaultValue={[100]}
@@ -119,9 +169,9 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                                     }
                                     className="h-5"
                                 />
-                                <small className="text-xs text-pretty text-gray-400">
+                                {/* <small className="text-xs text-pretty text-gray-400">
                                     {cdiPercentage}% do CDI
-                                </small>
+                                </small> */}
                             </div>
                         )}
                     </div>
@@ -140,10 +190,10 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                                     onSelectDate={handleSelectDate}
                                 />
                             </div>
-                            <div>{/* <Debugg print data={date} /> */}</div>
+                            <div>{/* <Debugg print data={dueDate} /> */}</div>
                         </div>
                         <div className="flex flex-col justify-end">
-                            <Button type="submit">
+                            <Button disabled={isDisable} type="submit">
                                 Calcular Equivalência →
                             </Button>
                         </div>
