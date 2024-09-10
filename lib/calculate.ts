@@ -8,15 +8,25 @@ type CdiObject = {
 
 type ResponseType = {
     message: string;
+    equivalentPercent: number;
+    equivalentCdi: number;
+    differenceInDays: number;
+    irTax: number;
 }
 
 export function calcularEquivalencia(returnType: string, cdiPercentage:number, fixedRate: number, dueDate:Date, cdiRate:CdiObject ) {
 
-const response: ResponseType = {
-    message: ""
-}
+let response: ResponseType = {
+    message: "",
+    equivalentPercent: 0,
+    equivalentCdi: 0,
+    differenceInDays: 0,
+    irTax: 0
+};
+
+
   const tipoRendimento = returnType;
-  const rendimento = returnType === "cdi" ? cdiPercentage : fixedRate
+  const rendimento = returnType === "cdi" ? cdiPercentage/100 : fixedRate
     Number(fixedRate) / 100;
   const vencimento = new Date(dueDate);
 
@@ -53,6 +63,11 @@ const response: ResponseType = {
   response.message = `Esse LCI/LCA equivale a um CDB com rendimento de ${rendimentoEquivalente.toFixed(
     2
   )}% ao ano. Ou ${(rendimentoEquivalente / cdiAtual).toFixed(2)}% do CDI. Dias corridos: ${diasCorridos}. IR: ${imposto}`;
+
+  response.equivalentPercent = Number(rendimentoEquivalente.toFixed(2))
+  response.equivalentCdi = Number((rendimentoEquivalente / cdiAtual).toFixed(2))
+  response.differenceInDays = diasCorridos
+  response.irTax = Number((imposto * 100).toFixed(2))
 
   return response;
 }

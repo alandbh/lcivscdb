@@ -13,7 +13,10 @@ type CdiObject = {
 
 export default async function Home({ params }: { params: any }) {
     if (apiUrl !== undefined) {
-        const cdiRateRaw = await fetch(apiUrl, { next: { revalidate: 3600 } });
+        const cdiRateRaw = await fetch(apiUrl, {
+            cache: "force-cache",
+            next: { revalidate: 3600 },
+        });
 
         cdiRate = await cdiRateRaw.json();
     }

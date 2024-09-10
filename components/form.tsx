@@ -6,11 +6,9 @@ import {
     CardTitle,
     CardDescription,
     CardContent,
-    CardFooter,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
-import { Button } from "@/components/ui/button";
 import { Datepicker } from "./ui/Datepicker";
 import { useEffect, useState } from "react";
 import Debugg from "./Debugg/Index";
@@ -21,9 +19,19 @@ import { differenceInDays } from "date-fns";
 
 import { calcularEquivalencia } from "@/lib/calculate";
 
+import CustomCta from "./ui/CustonCta";
+
 type CdiObject = {
     data: string;
     valor: string;
+};
+
+type ResponseType = {
+    message: string;
+    equivalentPercent: number;
+    equivalentCdi: number;
+    differenceInDays: number;
+    irTax: number;
 };
 
 export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
@@ -32,7 +40,7 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
     const [cdiPercentage, setCdiPercentage] = useState<number[]>([100]);
     const [fixedRate, setFixedRate] = useState<number>(6);
     const [isDisable, setIsDisable] = useState<boolean>(true);
-    const [message, setMessage] = useState<string | null>(null);
+    const [response, setResponse] = useState<ResponseType | null>(null);
 
     function handleSelectDate(date: Date) {
         console.log("dataa: ", new Date(date).getTime());
@@ -67,7 +75,7 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
             );
             console.log({ response });
 
-            setMessage(response.message);
+            setResponse(response);
         }
     }
 
@@ -179,9 +187,6 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                                     }
                                     className="h-5"
                                 />
-                                {/* <small className="text-xs text-pretty text-gray-400">
-                                    {cdiPercentage}% do CDI
-                                </small> */}
                             </div>
                         )}
                     </div>
@@ -203,54 +208,16 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                             <div>{/* <Debugg print data={dueDate} /> */}</div>
                         </div>
                         <div className="flex flex-col justify-end">
-                            <Button
-                                onClick={handleCalculateClick}
-                                disabled={isDisable}
-                                type="submit"
-                            >
-                                Calcular Equivalência →
-                            </Button>
+                            <CustomCta
+                                handleCalculateClick={handleCalculateClick}
+                                response={response}
+                                cdiRate={cdiRate}
+                                isDisable={isDisable}
+                            />
                         </div>
                     </div>
                 </CardContent>
-
-                {/* <CardFooter className="flex justify-end">
-                    <Button type="submit">Calcular Equivalência</Button>
-                </CardFooter> */}
-
-                {/* <hr />
-
-                <CardHeader>
-                    <CardTitle>Resultado</CardTitle>
-                    <CardDescription>
-                        Esta LCI/LCA equivale a um CDB de 12% ao ano ou 130% do
-                        CDI.
-                    </CardDescription>
-                </CardHeader> */}
             </Card>
-
-            {message && (
-                <div
-                    id="alert-additional-content-1"
-                    className="ring-4 max-w-2xl p-4 mb-4 text-indigo-800 border border-indigo-300 rounded-lg bg-indigo-50"
-                    role="alert"
-                >
-                    <div className="flex items-center">
-                        <svg
-                            className="flex-shrink-0 w-4 h-4 me-2"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                        >
-                            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-                        </svg>
-                        <span className="sr-only">Info</span>
-                        <h3 className="text-lg font-medium">Resultado</h3>
-                    </div>
-                    <div className="mt-2 mb-4 text-sm">{message}</div>
-                </div>
-            )}
         </>
     );
 }
