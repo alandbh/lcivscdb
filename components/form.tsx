@@ -14,7 +14,6 @@ import { useEffect, useState } from "react";
 import Debugg from "./Debugg/Index";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
-import { Input } from "./ui/input";
 import { differenceInDays } from "date-fns";
 
 import { calcularEquivalencia } from "@/lib/calculate";
@@ -38,7 +37,7 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
     const [dueDate, setDueDate] = useState<Date>();
     const [returnType, setReturnType] = useState<string>("cdi");
     const [cdiPercentage, setCdiPercentage] = useState<number[]>([100]);
-    const [fixedRate, setFixedRate] = useState<number>(6);
+    const [fixedRate, setFixedRate] = useState<number[]>([6]);
     const [isDisable, setIsDisable] = useState<boolean>(true);
     const [response, setResponse] = useState<ResponseType | null>(null);
 
@@ -59,8 +58,8 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
         setCdiPercentage(value);
     }
 
-    function handleFixedRateChange(value: string) {
-        setFixedRate(Number(value));
+    function handleFixedRateChange(value: number[]) {
+        setFixedRate(value);
         console.log("fixo", fixedRate);
     }
 
@@ -69,7 +68,7 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
             const response = calcularEquivalencia(
                 returnType,
                 Number(cdiPercentage[0]),
-                fixedRate,
+                fixedRate[0],
                 dueDate,
                 cdiRate
             );
@@ -92,7 +91,7 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
             }
         } else {
             if (
-                fixedRate > 6 &&
+                fixedRate[0] > 6 &&
                 dueDate &&
                 differenceInDays(dueDate.getTime(), new Date().getTime()) > 30
             ) {
@@ -108,12 +107,17 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
             <Card className="w-full md:max-w-2xl">
                 <Debugg data={cdiRate} filter="cdii" />
                 <CardHeader className="border-b mb-10">
-                    <CardTitle>Equivalência LCI/LCA vs CDB</CardTitle>
+                    <CardTitle className="leading-relaxed">
+                        Equivalência{" "}
+                        <span className="max-sm:whitespace-nowrap">
+                            LCI/LCA vs CDB
+                        </span>
+                    </CardTitle>
                     <CardDescription>
                         Preencha os dados da sua LCI/LCA.
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="grid gap-4  grid-rows-[80px_80px] max-sm:flex max-sm:flex-col max-sm:gap-10">
+                <CardContent className="grid gap-4  grid-rows-[80px_80px] max-sm:flex max-sm:flex-col max-sm:gap-10 max-sm:-mt-5">
                     <div className="grid grid-cols-4 gap-4 max-sm:flex max-sm:flex-col max-sm:gap-10">
                         <div className="col-span-2">
                             <Label className="font-bold" htmlFor="income-type">
@@ -146,27 +150,24 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                                     className="font-bold"
                                     htmlFor="income-amount"
                                 >
-                                    Rendimento ao ano:
+                                    Rendimento:{" "}
+                                    <span className="text-indigo-500">
+                                        {fixedRate[0]}%
+                                    </span>{" "}
+                                    a.a
                                 </Label>
                                 <div className="flex items-center gap-2">
-                                    <Input
-                                        id="income-amount"
-                                        type="number"
-                                        placeholder="Ex: 11,3%"
-                                        className="w-28"
-                                        step="0.1"
+                                    <Slider
+                                        defaultValue={[6]}
                                         value={fixedRate}
-                                        onChange={(event) =>
-                                            handleFixedRateChange(
-                                                (
-                                                    event.target as HTMLInputElement
-                                                ).value
-                                            )
+                                        min={0}
+                                        max={20}
+                                        step={0.1}
+                                        onValueChange={(value) =>
+                                            handleFixedRateChange(value)
                                         }
+                                        className="h-5"
                                     />
-                                    <small className="text-xs text-pretty text-gray-400">
-                                        a/a
-                                    </small>
                                 </div>
                             </div>
                         ) : (
@@ -175,7 +176,10 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                                     className="font-bold"
                                     htmlFor="income-amount"
                                 >
-                                    {cdiPercentage[0]}% do CDI:
+                                    <span className="text-indigo-500">
+                                        {cdiPercentage[0]}%
+                                    </span>{" "}
+                                    do CDI:
                                 </Label>
                                 <Slider
                                     defaultValue={[100]}

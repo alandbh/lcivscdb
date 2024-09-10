@@ -25,9 +25,7 @@ let response: ResponseType = {
 };
 
 
-  const tipoRendimento = returnType;
-  const rendimento = returnType === "cdi" ? cdiPercentage/100 : fixedRate
-    Number(fixedRate) / 100;
+  const rendimento = returnType === "cdi" ? cdiPercentage/100 : fixedRate / 100;
   const vencimento = new Date(dueDate);
 
 //   if (isNaN(rendimento) || !vencimento) {
@@ -42,12 +40,12 @@ let response: ResponseType = {
   const anos = diasUteis / 252; // Aproximadamente 252 dias úteis por ano
 
   let rendimentoLCI_LCA;
-  if (tipoRendimento === "cdi") {
+  if (returnType === "cdi") {
     rendimentoLCI_LCA = Math.pow(1 + rendimento * cdiAtual, anos) - 1;
-    console.log({rendimento, cdiAtual, anos});
     
-  } else {
+} else {
     rendimentoLCI_LCA = Math.pow(1 + rendimento, anos) - 1;
+    console.log({rendimento, anos});
   }
 
   const imposto = calcularImpostoRenda(diasCorridos);
