@@ -11,7 +11,6 @@ import { Button } from "./button";
 // import { Container } from './styles';
 
 type ResponseType = {
-    message: string;
     equivalentPercent: number;
     equivalentCdi: number;
     differenceInDays: number;

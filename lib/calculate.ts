@@ -1,5 +1,4 @@
-import {  differenceInDays, differenceInBusinessDays } from "date-fns";
-
+import { differenceInDays, differenceInBusinessDays } from "date-fns";
 
 type CdiObject = {
     data: string;
@@ -7,118 +6,69 @@ type CdiObject = {
 };
 
 type ResponseType = {
-    message: string;
     equivalentPercent: number;
     equivalentCdi: number;
     differenceInDays: number;
     irTax: number;
-}
-
-export function calcularEquivalencia(returnType: string, cdiPercentage:number, fixedRate: number, dueDate:Date, cdiRate:CdiObject ) {
-
-let response: ResponseType = {
-    message: "",
-    equivalentPercent: 0,
-    equivalentCdi: 0,
-    differenceInDays: 0,
-    irTax: 0
 };
 
+export function calculateEquivalence(
+    returnType: string,
+    cdiPercentage: number,
+    fixedRate: number,
+    dueDate: Date,
+    cdiRate: CdiObject
+) {
+    let response: ResponseType = {
+        equivalentPercent: 0,
+        equivalentCdi: 0,
+        differenceInDays: 0,
+        irTax: 0,
+    };
 
-  const rendimento = returnType === "cdi" ? cdiPercentage/100 : fixedRate / 100;
-  const vencimento = new Date(dueDate);
+    const yeld = returnType === "cdi" ? cdiPercentage / 100 : fixedRate / 100;
 
-//   if (isNaN(rendimento) || !vencimento) {
-//     resultadoDiv.textContent =
-//       "Por favor, preencha todos os campos corretamente.";
-//     return;
-//   }
+    const cdiRatePercent = Number(cdiRate.valor) / 100; // Current CDI in decimal format
+    const deltaBusinessDays = differenceInBusinessDays(dueDate, new Date());
+    const deltaFullDays = differenceInDays(dueDate, new Date());
+    const deltaYears = deltaBusinessDays / 252; // Near 252 business days in a year
 
-  const cdiAtual = Number(cdiRate.valor) / 100; // CDI atual em decimal
-  const diasUteis = calcularDiasUteis(new Date(), vencimento);
-  const diasCorridos = calcularDiasCorridos(new Date(), vencimento);
-  const anos = diasUteis / 252; // Aproximadamente 252 dias úteis por ano
+    let yeldLCI_LCA;
+    if (returnType === "cdi") {
+        yeldLCI_LCA = Math.pow(1 + yeld * cdiRatePercent, deltaYears) - 1;
+    } else {
+        yeldLCI_LCA = Math.pow(1 + yeld, deltaYears) - 1;
+        console.log({ yeld, deltaYears });
+    }
 
-  let rendimentoLCI_LCA;
-  if (returnType === "cdi") {
-    rendimentoLCI_LCA = Math.pow(1 + rendimento * cdiAtual, anos) - 1;
-    
-} else {
-    rendimentoLCI_LCA = Math.pow(1 + rendimento, anos) - 1;
-    console.log({rendimento, anos});
-  }
+    const irTax = getBrazillianIRTax(deltaFullDays);
+    const yeldCDBWithoutTax = Math.pow(1 + cdiRatePercent, deltaYears) - 1;
+    const yeldCDBWithTax = yeldCDBWithoutTax * (1 - irTax);
 
-  const imposto = calcularImpostoRenda(diasCorridos);
-  const rendimentoCDBBruto = Math.pow(1 + cdiAtual, anos) - 1;
-  const rendimentoCDBLiquido = rendimentoCDBBruto * (1 - imposto);
+    const equivalentYeld =
+        ((Math.pow(1 + yeldLCI_LCA, 1 / deltaYears) - 1) /
+            (Math.pow(1 + yeldCDBWithTax, 1 / deltaYears) - 1)) *
+        cdiRatePercent *
+        100;
 
-  const rendimentoEquivalente =
-    ((Math.pow(1 + rendimentoLCI_LCA, 1 / anos) - 1) /
-      (Math.pow(1 + rendimentoCDBLiquido, 1 / anos) - 1)) *
-    cdiAtual *
-    100;
+    response.equivalentPercent = Number(equivalentYeld.toFixed(2));
+    response.equivalentCdi = Number(
+        (equivalentYeld / cdiRatePercent).toFixed(2)
+    );
+    response.differenceInDays = deltaFullDays;
+    response.irTax = Number((irTax * 100).toFixed(2));
 
-  response.message = `Esse LCI/LCA equivale a um CDB com rendimento de ${rendimentoEquivalente.toFixed(
-    2
-  )}% ao ano. Ou ${(rendimentoEquivalente / cdiAtual).toFixed(2)}% do CDI. Dias corridos: ${diasCorridos}. IR: ${imposto}`;
-
-  response.equivalentPercent = Number(rendimentoEquivalente.toFixed(2))
-  response.equivalentCdi = Number((rendimentoEquivalente / cdiAtual).toFixed(2))
-  response.differenceInDays = diasCorridos
-  response.irTax = Number((imposto * 100).toFixed(2))
-
-  return response;
+    return response;
 }
 
-function calcularDiasUteis(inicio:Date, fim:Date) {
-//   let count = 0;
-//   const date = new Date(inicio);
-//   while (date <= fim) {
-//     const day = date.getDay();
-//     if (day !== 0 && day !== 6) {
-//       // Exclui sábado e domingo
-//       count++;
-//     }
-//     date.setDate(date.getDate() + 1);
-//   }
-  return differenceInBusinessDays(fim, inicio);
-}
-
-function calcularDiasCorridos(inicio:Date, fim:Date) {
-  
-//   // Calcula a diferença em milissegundos
-//   const diffEmMilissegundos = Math.abs(fim - inicio);
-
-//   // Converte milissegundos para dias
-//   const diasEmMilissegundos = 1000 * 60 * 60 * 24;
-//   const diasEntreDatas = Math.ceil(diffEmMilissegundos / diasEmMilissegundos);
-
-const diasEntreDatas = differenceInDays(fim, inicio);
-  
-  return diasEntreDatas ;
-  
-}
-
-function calcularImpostoRendaAnos(anos:number) {
-  if (anos < 1) {
-    return 0.22; // 22% para até 1 ano
-  } else if (anos < 2) {
-    alert("1 ano");
-    return 0.2; // 20% para até 2 anos
-  } else {
-    return 0.15; // 15% para mais de 2 anos
-  }
-}
-
-function calcularImpostoRenda(dias:number) {
-  if (dias <= 180) {
-    return 0.225; // 22.5% para até 6 meses
-  } else if (dias <= 360) {
-    alert("1 ano");
-    return 0.2; // 20% para até 1 anos
-  } else if (dias <= 720) {
-    return 0.175 // 17,5% para até 2 anos
-  } else {
-    return 0.15; // 15% para mais de 2 anos
-  }
+function getBrazillianIRTax(days: number) {
+    if (days <= 180) {
+        return 0.225; // 22.5% - investments up to 6 months
+    } else if (days <= 360) {
+        return 0.2; // 20% - investments up to 1 year
+    } else if (days <= 720) {
+        return 0.175; // 17,5% - investments up to 2 years
+    } else {
+        return 0.15; // 15% - investments longer than 2 years
+    }
 }

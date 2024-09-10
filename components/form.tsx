@@ -16,7 +16,7 @@ import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { differenceInDays } from "date-fns";
 
-import { calcularEquivalencia } from "@/lib/calculate";
+import { calculateEquivalence } from "@/lib/calculate";
 
 import CustomCta from "./ui/CustonCta";
 
@@ -26,7 +26,6 @@ type CdiObject = {
 };
 
 type ResponseType = {
-    message: string;
     equivalentPercent: number;
     equivalentCdi: number;
     differenceInDays: number;
@@ -65,14 +64,13 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
 
     function handleCalculateClick() {
         if (dueDate) {
-            const response = calcularEquivalencia(
+            const response = calculateEquivalence(
                 returnType,
-                Number(cdiPercentage[0]),
+                cdiPercentage[0],
                 fixedRate[0],
                 dueDate,
                 cdiRate
             );
-            console.log({ response });
 
             setResponse(response);
         }
