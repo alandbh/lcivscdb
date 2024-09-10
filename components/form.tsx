@@ -40,6 +40,8 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
     const [isDisable, setIsDisable] = useState<boolean>(true);
     const [response, setResponse] = useState<ResponseType | null>(null);
 
+    // let cdiRate = cdiRateArray ? cdiRateArray[0] : null;
+
     function handleSelectDate(date: Date) {
         console.log("dataa: ", new Date(date).getTime());
 
@@ -63,7 +65,7 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
     }
 
     function handleCalculateClick() {
-        if (dueDate) {
+        if (dueDate && cdiRate) {
             const response = calculateEquivalence(
                 returnType,
                 cdiPercentage[0],
