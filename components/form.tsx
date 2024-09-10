@@ -117,7 +117,7 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                         Preencha os dados da sua LCI/LCA.
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="grid gap-4  grid-rows-[80px_80px] max-sm:flex max-sm:flex-col max-sm:gap-10 max-sm:-mt-5">
+                <CardContent className="grid gap-12  grid-rows-[80px_80px] max-sm:flex max-sm:flex-col max-sm:gap-10 max-sm:-mt-5">
                     <div className="grid grid-cols-4 gap-4 max-sm:flex max-sm:flex-col max-sm:gap-10">
                         <div className="col-span-2">
                             <Label className="font-bold" htmlFor="income-type">
@@ -125,7 +125,7 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                             </Label>
                             <RadioGroup
                                 defaultValue={returnType}
-                                className="flex gap-5 mt-3"
+                                className="flex gap-5 mt-6"
                                 onValueChange={(value) =>
                                     handleReturnTypeChange(value)
                                 }
@@ -146,16 +146,23 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
 
                         {returnType === "prefixed" ? (
                             <div className="space-y-2 col-span-2">
-                                <Label
-                                    className="font-bold"
-                                    htmlFor="income-amount"
-                                >
-                                    Rendimento:{" "}
-                                    <span className="text-indigo-500">
-                                        {fixedRate[0]}%
-                                    </span>{" "}
-                                    a.a
-                                </Label>
+                                <div>
+                                    <Label
+                                        className="font-bold"
+                                        htmlFor="income-amount"
+                                    >
+                                        Rendimento:{" "}
+                                        <span className="text-indigo-500">
+                                            {fixedRate[0]}%
+                                        </span>{" "}
+                                        a.a
+                                    </Label>
+                                    <div className="-mt-2 mb-2">
+                                        <small className="text-slate-400">
+                                            Acima de 6% ao ano.
+                                        </small>
+                                    </div>
+                                </div>
                                 <div className="flex items-center gap-2">
                                     <Slider
                                         defaultValue={[6]}
@@ -172,15 +179,22 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                             </div>
                         ) : (
                             <div className="space-y-2 col-span-2">
-                                <Label
-                                    className="font-bold"
-                                    htmlFor="income-amount"
-                                >
-                                    <span className="text-indigo-500">
-                                        {cdiPercentage[0]}%
-                                    </span>{" "}
-                                    do CDI:
-                                </Label>
+                                <div>
+                                    <Label
+                                        className="font-bold"
+                                        htmlFor="income-amount"
+                                    >
+                                        <span className="text-indigo-500">
+                                            {cdiPercentage[0]}%
+                                        </span>{" "}
+                                        do CDI:
+                                    </Label>
+                                    <div className="-mt-2 mb-2">
+                                        <small className="text-slate-400">
+                                            Acima de 80% do CDI.
+                                        </small>
+                                    </div>
+                                </div>
                                 <Slider
                                     defaultValue={[100]}
                                     value={cdiPercentage}
@@ -202,6 +216,11 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                             >
                                 Data de Vencimento:
                             </Label>
+                            <div className="-mt-5 mb-3">
+                                <small className="text-slate-400">
+                                    Escolha uma data acima de 30 dias.
+                                </small>
+                            </div>
 
                             <div>
                                 <Datepicker
