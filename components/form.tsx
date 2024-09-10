@@ -105,7 +105,7 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
 
     return (
         <>
-            <Card className="w-full max-w-2xl">
+            <Card className="w-full md:max-w-2xl">
                 <Debugg data={cdiRate} filter="cdii" />
                 <CardHeader className="border-b mb-10">
                     <CardTitle>Equivalência LCI/LCA vs CDB</CardTitle>
@@ -113,8 +113,8 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                         Preencha os dados da sua LCI/LCA.
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="grid gap-4  grid-rows-[80px_80px]">
-                    <div className="grid grid-cols-4 gap-4">
+                <CardContent className="grid gap-4  grid-rows-[80px_80px] max-sm:flex max-sm:flex-col max-sm:gap-10">
+                    <div className="grid grid-cols-4 gap-4 max-sm:flex max-sm:flex-col max-sm:gap-10">
                         <div className="col-span-2">
                             <Label className="font-bold" htmlFor="income-type">
                                 Tipo de Rendimento:
@@ -190,7 +190,7 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                             </div>
                         )}
                     </div>
-                    <div className="space-y-2 grid-cols-2 grid gap-5">
+                    <div className="space-y-2 grid-cols-2 grid gap-5 max-sm:flex max-sm:flex-col">
                         <div className="flex flex-col justify-end">
                             <Label
                                 className="font-bold mb-4"
