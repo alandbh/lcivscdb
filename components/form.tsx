@@ -32,6 +32,7 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
     const [cdiPercentage, setCdiPercentage] = useState<number[]>([100]);
     const [fixedRate, setFixedRate] = useState<number>(6);
     const [isDisable, setIsDisable] = useState<boolean>(true);
+    const [message, setMessage] = useState<string | null>(null);
 
     function handleSelectDate(date: Date) {
         console.log("dataa: ", new Date(date).getTime());
@@ -42,7 +43,7 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
     function handleReturnTypeChange(value: string) {
         console.log("eee", value);
         setReturnType(value);
-        setIsDisable(true);
+        // setIsDisable(true);
     }
 
     function handleCdiPercentageChange(value: number[]) {
@@ -57,14 +58,23 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
 
     function handleCalculateClick() {
         if (dueDate) {
-            calcularEquivalencia(returnType, fixedRate, dueDate, cdiRate);
+            const response = calcularEquivalencia(
+                returnType,
+                Number(cdiPercentage[0]),
+                fixedRate,
+                dueDate,
+                cdiRate
+            );
+            console.log({ response });
+
+            setMessage(response.message);
         }
     }
 
     useEffect(() => {
         if (returnType === "cdi") {
             if (
-                cdiPercentage[0] > 50 &&
+                cdiPercentage[0] > 80 &&
                 dueDate &&
                 differenceInDays(dueDate.getTime(), new Date().getTime()) > 30
             ) {
@@ -83,7 +93,7 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                 setIsDisable(true);
             }
         }
-    }, [cdiPercentage, dueDate, fixedRate]);
+    }, [cdiPercentage, dueDate, fixedRate, returnType]);
 
     return (
         <>
@@ -193,7 +203,11 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                             <div>{/* <Debugg print data={dueDate} /> */}</div>
                         </div>
                         <div className="flex flex-col justify-end">
-                            <Button disabled={isDisable} type="submit">
+                            <Button
+                                onClick={handleCalculateClick}
+                                disabled={isDisable}
+                                type="submit"
+                            >
                                 Calcular Equivalência →
                             </Button>
                         </div>
@@ -214,32 +228,29 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                     </CardDescription>
                 </CardHeader> */}
             </Card>
-            <div
-                id="alert-additional-content-1"
-                className="ring-4 max-w-2xl p-4 mb-4 text-indigo-800 border border-indigo-300 rounded-lg bg-indigo-50"
-                role="alert"
-            >
-                <div className="flex items-center">
-                    <svg
-                        className="flex-shrink-0 w-4 h-4 me-2"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                    >
-                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-                    </svg>
-                    <span className="sr-only">Info</span>
-                    <h3 className="text-lg font-medium">
-                        This is a info alert
-                    </h3>
+
+            {message && (
+                <div
+                    id="alert-additional-content-1"
+                    className="ring-4 max-w-2xl p-4 mb-4 text-indigo-800 border border-indigo-300 rounded-lg bg-indigo-50"
+                    role="alert"
+                >
+                    <div className="flex items-center">
+                        <svg
+                            className="flex-shrink-0 w-4 h-4 me-2"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                        >
+                            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                        </svg>
+                        <span className="sr-only">Info</span>
+                        <h3 className="text-lg font-medium">Resultado</h3>
+                    </div>
+                    <div className="mt-2 mb-4 text-sm">{message}</div>
                 </div>
-                <div className="mt-2 mb-4 text-sm">
-                    More info about this info alert goes here. This example text
-                    is going to run a bit longer so that you can see how spacing
-                    within an alert works with this kind of content.
-                </div>
-            </div>
+            )}
         </>
     );
 }

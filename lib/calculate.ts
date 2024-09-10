@@ -10,13 +10,13 @@ type ResponseType = {
     message: string;
 }
 
-export function calcularEquivalencia(returnType: string, fixedRate: number, dueDate:Date, cdiRate:CdiObject ) {
+export function calcularEquivalencia(returnType: string, cdiPercentage:number, fixedRate: number, dueDate:Date, cdiRate:CdiObject ) {
 
 const response: ResponseType = {
     message: ""
 }
   const tipoRendimento = returnType;
-  const rendimento =
+  const rendimento = returnType === "cdi" ? cdiPercentage : fixedRate
     Number(fixedRate) / 100;
   const vencimento = new Date(dueDate);
 
@@ -32,8 +32,10 @@ const response: ResponseType = {
   const anos = diasUteis / 252; // Aproximadamente 252 dias úteis por ano
 
   let rendimentoLCI_LCA;
-  if (tipoRendimento === "percentual") {
+  if (tipoRendimento === "cdi") {
     rendimentoLCI_LCA = Math.pow(1 + rendimento * cdiAtual, anos) - 1;
+    console.log({rendimento, cdiAtual, anos});
+    
   } else {
     rendimentoLCI_LCA = Math.pow(1 + rendimento, anos) - 1;
   }
