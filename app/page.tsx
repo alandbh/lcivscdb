@@ -1,6 +1,4 @@
-import Debugg from "@/components/Debugg/Index";
 import { FormCompare } from "@/components/form";
-import Image from "next/image";
 
 const apiUrl: string | undefined = process.env.BCB_API_URL;
 
@@ -11,7 +9,7 @@ type CdiObject = {
     valor: string;
 };
 
-export default async function Home({ params }: { params: any }) {
+export default async function Home() {
     if (apiUrl !== undefined) {
         const cdiRateRaw = await fetch(apiUrl, {
             cache: "force-cache",
