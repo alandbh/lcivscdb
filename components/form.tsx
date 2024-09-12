@@ -192,7 +192,8 @@ export function FormCompare({ cdiRate }: { cdiRate: CdiObject }) {
                                     </Label>
                                     <div className="-mt-2 mb-2">
                                         <small className="text-slate-400">
-                                            Acima de 80% do CDI.
+                                            Escolha um valor acima de 80% do
+                                            CDI.
                                         </small>
                                     </div>
                                 </div>
